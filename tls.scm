@@ -138,3 +138,25 @@
       ((eql? (car l) s) (cdr l))
       (else (cons (car l) (rember s (cdr l)))))))
 
+(define numbered?
+  (lambda (aexp)
+    (cond
+      ((atom? aexp) (number? aexp))
+      (else
+        (and (numbered? (car aexp))
+	  (numbered?
+	    (car (cdr (cdr aexp)))))))))
+
+(define value
+  (lambda (nexp)
+    (cond
+      ((atom? nexp) nexp)
+      ((eq? (car (cdr nexp)) '+)
+       (r+ (value (car nexp))
+           (value (car (cdr (cdr nexp))))))
+      ((eq? (car (cdr nexp)) 'x)
+       (mul (value (car nexp))
+            (value (car (cdr (cdr nexp))))))
+      (else
+       (ex (value (car nexp))
+           (value (car (cdr (cdr nexp)))))))))
